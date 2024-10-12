@@ -4,16 +4,19 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .models import Product, Category, Post
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, GenericAPIView
+from .models import Product, Category, Post, MultiLanguageContent
 from .serializers import User, UserSerializer
 from .serializers import ProductSerializer, CategorySerializer, PostSerializer
+from .serializers import MultiLanguageContentWriteSerializer, RuMultiLanguageContentReadSerializer, EnMultiLanguageContentReadSerializer
+from . import mixins as u_mixins
 
 
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class ProductListCreateView(APIView):
@@ -57,11 +60,17 @@ def category_view(request, pk=None):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PostListCreateView(ListCreateAPIView):
+class PostListCreateView(u_mixins.CreatedByMixin, ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    # permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class MultiLanguageContentListCreateView(u_mixins.CreatedByMixin, ModelViewSet):
+    queryset = MultiLanguageContent.objects.all()

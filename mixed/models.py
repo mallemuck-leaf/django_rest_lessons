@@ -15,3 +15,10 @@ class Post(models.Model):
     info = models.CharField(max_length=100)
     text = models.TextField()
     author = models.CharField(max_length=20)
+
+
+class MultiLanguageContent(models.Model):
+    title_ru = models.CharField(max_length=20)
+    title_en = models.CharField(max_length=20)
+    text_ru = models.TextField()
+    text_en = models.TextField()
